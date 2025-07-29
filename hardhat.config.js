@@ -1,6 +1,9 @@
 require("@nomicfoundation/hardhat-toolbox");
 require("@chainlink/env-enc").config();
 require("./tasks")
+require("@nomicfoundation/hardhat-ethers");
+require("hardhat-deploy");
+require("hardhat-deploy-ethers");
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
@@ -17,5 +20,13 @@ module.exports = {
     apiKey: {
       sepolia: process.env.ETHERSCAN_API_KEY
     }
+  },
+  namedAccounts: {
+    firstAccount: {
+      default: 0
+    },
+    secondAccount: {
+      default: 1
+    },
   }
 };

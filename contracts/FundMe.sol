@@ -22,16 +22,20 @@ contract FundMe {
     mapping (address => uint256) public funderToAmount;
     uint256 constant MINIMUM_VALUE = 100 * 10 ** 18; // 最小限制100U（约为 0.026），按eth价格为3780
     uint256 constant TARGET_VALUE = 200 * 10 ** 18; // 目标值300U（约为 0.053），按eth价格为3780
-    AggregatorV3Interface internal dataFeed;
+    AggregatorV3Interface public dataFeed;
     address public owner; // 管理员
     uint256 public deploymentTimestamp; // 部署时间戳，秒
     uint256 public lockTime; // 锁定时间
     address fundTokenAddr; // erc20 token 地址
     bool public getFundSuccess; // 是否完成提款
 
-    constructor(uint256 _lockTime) {
+    event FundWithdrawByOwner(uint256);
+    event RefundByFunder(address, uint256);
+
+    constructor(uint256 _lockTime, address _dataFeedAddr) {
         // 指定 Sepolia 测试网略
-        dataFeed = AggregatorV3Interface(0x694AA1769357215DE4FAC081bf1f309aDC325306);
+        // dataFeed = AggregatorV3Interface(0x694AA1769357215DE4FAC081bf1f309aDC325306);
+        dataFeed = AggregatorV3Interface(_dataFeedAddr);
         owner = msg.sender;
         deploymentTimestamp = blockTime();
         lockTime = _lockTime;
@@ -82,10 +86,12 @@ contract FundMe {
 
     // 提款
     function getFund() public onlyOwner windowClosed {
-        require(convertEthToUsd(address(this).balance) >= TARGET_VALUE, "Target is not reached");
-        (bool success, ) = payable(msg.sender).call{value: address(this).balance}("");
+        uint256 val = address(this).balance;
+        require(convertEthToUsd(val) >= TARGET_VALUE, "Target is not reached");
+        (bool success, ) = payable(msg.sender).call{value: val}("");
         require(success, "transaction fail");
         getFundSuccess = true;
+        emit FundWithdrawByOwner(val);
     }
 
     // 退款
@@ -99,6 +105,7 @@ contract FundMe {
             funderToAmount[msg.sender] = sendVal;
         }
         require(success, "transaction fail");
+        emit RefundByFunder(msg.sender, sendVal);
     }
 
     // 设置 fundToken 合约地址
