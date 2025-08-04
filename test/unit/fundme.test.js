@@ -1,9 +1,10 @@
 const { ethers, deployments, getNamedAccounts } = require("hardhat")
 const { assert, expect } = require("chai");
-const { developmentChains, networkConfig } = require("../helper-hardhat-config");
+const { developmentChains, networkConfig } = require("../../helper-hardhat-config");
 const helpers = require("@nomicfoundation/hardhat-network-helpers")
 
-describe("test fundme contract", async function() {
+developmentChains.includes(network.name) && 
+describe("unit test fundme contract", async function() {
     let fundMe, fundMeSecondAccount, firstAccount, secondAccount, mockV3AggregatorAddr;
     beforeEach(async() => {
         // console.log("start beforeEach ...........................................")

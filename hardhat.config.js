@@ -9,6 +9,9 @@ require("hardhat-deploy-ethers");
 module.exports = {
   defaultNetwork: "hardhat",
   solidity: "0.8.28",
+  mocha: {
+    timeout: 300 * 1000
+  },
   networks: {
     sepolia: {
       url: process.env.SEPOLIA_RPC_URL,
@@ -28,5 +31,8 @@ module.exports = {
     secondAccount: {
       default: 1
     },
+  },
+  gasReporter: {
+    enabled: false
   }
 };
